@@ -673,11 +673,15 @@ public static void update() {
 						}
 						#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_0_1 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3 && !UNITY_4_5
                         else if (tweenAction == TweenAction.CANVAS_ALPHA){
-                            Color c = tween.uiImage.color;
-                            c.a = val;
-                            tween.uiImage.color = c;
-                            if(tween.useRecursion)
+                        	if(tween.uiImage!=null){
+	                            Color c = tween.uiImage.color;
+	                            c.a = val;
+	                            tween.uiImage.color = c;
+	                        }
+                            if(tween.useRecursion){
                             	alphaRecursive( tween.rectTransform, val, 0 );
+                            	textAlphaRecursive( tween.rectTransform, val);
+                            }
                         }
                         else if (tweenAction == TweenAction.CANVAS_COLOR){
                             Color toColor = tweenColor(tween, val);
@@ -1012,10 +1016,7 @@ private static void alphaRecursive( RectTransform rectTransform, float val, int 
 			    c.a = val;
 			    uiImage.color = c;
 			}
-			
-			if(recursiveLevel==0) // We only want to kick off this recursion on the first level
-				textAlphaRecursive(child, val);
-
+		
 			alphaRecursive(child, val, recursiveLevel + 1);
 		}
 	}

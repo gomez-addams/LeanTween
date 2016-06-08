@@ -426,7 +426,7 @@ public static void update() {
 					tween.init();
 				}
 				
-				if(tween.delay<=0){
+				if(tween.delay<=0 && tween.direction!=0){
 					// Move Values
 					if(timeTotal<=0f){
 						//Debug.LogError("time total is zero Time.timeScale:"+Time.timeScale+" useEstimatedTime:"+tween.useEstimatedTime);
@@ -669,6 +669,8 @@ public static void update() {
 			    			#endif
 		    				if(dt!=0f && tween.onUpdateColor!=null){
 								tween.onUpdateColor(toColor);
+							}else if(dt!=0f && tween.onUpdateColorObject!=null){
+								tween.onUpdateColorObject(toColor, tween.onUpdateParam);
 							}
 						}
 						#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_0_1 && !UNITY_4_1 && !UNITY_4_2 && !UNITY_4_3 && !UNITY_4_5
@@ -804,7 +806,7 @@ public static void update() {
 									case LeanTweenType.easeInOutBounce:
 										newVect = new Vector3(easeInOutBounce(tween.from.x, tween.to.x, ratioPassed), easeInOutBounce(tween.from.y, tween.to.y, ratioPassed), easeInOutBounce(tween.from.z, tween.to.z, ratioPassed)); break;
 									case LeanTweenType.easeInBack:
-										newVect = new Vector3(easeInBack(tween.from.x, tween.to.x, ratioPassed), easeInBack(tween.from.y, tween.to.y, ratioPassed), easeInBack(tween.from.z, tween.to.z, ratioPassed)); break;
+										newVect = new Vector3(easeInBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot), easeInBack(tween.from.y, tween.to.y, ratioPassed, tween.overshoot), easeInBack(tween.from.z, tween.to.z, ratioPassed, tween.overshoot)); break;
 									case LeanTweenType.easeOutBack:
 										newVect = new Vector3(easeOutBack(tween.from.x, tween.to.x, ratioPassed, tween.overshoot), easeOutBack(tween.from.y, tween.to.y, ratioPassed, tween.overshoot), easeOutBack(tween.from.z, tween.to.z, ratioPassed, tween.overshoot)); break;
 									case LeanTweenType.easeInOutBack:
@@ -1701,6 +1703,15 @@ public static LTDescr colorText(RectTransform rectTransform, Color to, float tim
 }
 #endif
 
+/**
+* Call a method after a specified amount of time
+* 
+* @method LeanTween.delayedCall
+* @param {GameObject} gameObject:GameObject Gameobject that you wish to associate with this delayed call
+* @param {float} time:float delay The time you wish to pass before the method is called
+* @return {LTDescr} LTDescr an object that distinguishes the tween
+* @example LeanTween.delayedCall(gameObject, 1f, ()=>{ <br>Debug.Log("I am called one second later!");<br> }));
+*/
 public static LTDescr delayedCall( float delayTime, Action callback){
 	return pushNewTween( tweenEmpty, Vector3.zero, delayTime, TweenAction.CALLBACK, options().setOnComplete(callback) );
 }
@@ -2355,6 +2366,10 @@ public static LTDescr value(GameObject gameObject, Action<float, float> callOnUp
 */
 
 public static LTDescr value(GameObject gameObject, Action<Color> callOnUpdate, Color from, Color to, float time){
+	return pushNewTween( gameObject, new Vector3(1.0f,to.a,0.0f), time, TweenAction.CALLBACK_COLOR, options().setPoint( new Vector3(to.r, to.g, to.b) )
+		.setAxis( new Vector3(from.r, from.g, from.b) ).setFrom( new Vector3(0.0f, from.a, 0.0f) ).setHasInitialized(false).setOnUpdateColor(callOnUpdate) );
+}
+public static LTDescr value(GameObject gameObject, Action<Color,object> callOnUpdate, Color from, Color to, float time){
 	return pushNewTween( gameObject, new Vector3(1.0f,to.a,0.0f), time, TweenAction.CALLBACK_COLOR, options().setPoint( new Vector3(to.r, to.g, to.b) )
 		.setAxis( new Vector3(from.r, from.g, from.b) ).setFrom( new Vector3(0.0f, from.a, 0.0f) ).setHasInitialized(false).setOnUpdateColor(callOnUpdate) );
 }
@@ -3299,7 +3314,8 @@ public class LTBezierPath {
 * Animate along a set of points that need to be in the format: controlPoint, point1, point2.... pointLast, endControlPoint
 * @class LTSpline
 * @constructor
-* @param {Vector3 Array} pts A set of points that define the points the path will pass through (starting with starting control point, and ending with a control point)
+* @param {Vector3 Array} pts A set of points that define the points the path will pass through (starting with starting control point, and ending with a control point)<br>
+<i><strong>Note:</strong> The first and last item just define the angle of the end points, they are not actually used in the spline path itself. If you do not care about the angle you can jus set the first two items and last two items as the same value.</i>
 * @example 
 * LTSpline ltSpline = new LTSpline( new Vector3[] { new Vector3(0f,0f,0f),new Vector3(0f,0f,0f), new Vector3(0f,0.5f,0f), new Vector3(1f,1f,0f), new Vector3(1f,1f,0f)} );<br><br>
 * LeanTween.moveSpline(lt, ltSpline.vec3, 4.0f).setOrientToPath(true).setDelay(1f).setEase(LeanTweenType.easeInOutQuad); // animate <br>
@@ -3317,6 +3333,7 @@ public class LTSpline {
 
 
 	public Vector3[] pts;
+	[System.NonSerialized]
 	public Vector3[] ptsAdj;
 	public int ptsAdjLength;
 	public bool orientToPath;

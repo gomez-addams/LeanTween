@@ -57,6 +57,9 @@ public interface LTDescr
 	void cleanup();
 	int uniqueId { get; }
 	int id { get; }
+	#if !UNITY_3_5 && !UNITY_4_0 && !UNITY_4_0_1 && !UNITY_4_1 && !UNITY_4_2
+	SpriteRenderer spriteRen{ get; set; }
+	#endif
 	void init();
 	LTDescr pause();
 	void reset();
@@ -75,6 +78,7 @@ public interface LTDescr
 	LTDescr setHasInitialized(bool has);
 	LTDescr setId(uint id);
 	LTDescr setIgnoreTimeScale(bool useUnScaledTime);
+	LTDescr setSpeed( float speed );
 	LTDescr setLoopClamp();
 	LTDescr setLoopClamp(int loops);
 	LTDescr setLoopCount(int loopCount);

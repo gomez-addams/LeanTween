@@ -3,6 +3,10 @@ using System.Collections;
 using System;
 using System.Threading;
 
+#if UNITY_WSA
+using Hashtable = System.Collections.Generic.Dictionary<object, object>;
+#endif
+
 public class TestingAllCS : MonoBehaviour {
 	public AnimationCurve customAnimationCurve;
 	public Transform pt1;

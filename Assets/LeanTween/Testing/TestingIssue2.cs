@@ -4,28 +4,29 @@ using System.Collections;
 public class TestingIssue2 : MonoBehaviour {
 	public RectTransform rect;
 	public GameObject go;
+	public GameObject go2;
 
-	// Use this for initialization
+	private LTDescr descr;
+
 	void Start () {
-		
-		int id1 = LeanTween.move(go,new Vector3(-.209f,-3.891f,-01.162f),2.0f).setEase(LeanTweenType.easeInQuart).id;
-		int id2 = LeanTween.rotate(rect,360f,1f).id;
+		descr = LeanTween.move(go, new Vector3(0f,0,100f), 10f);
+		descr.passed = 5f; // this should put it at the midway
+		descr.updateNow();
+		descr.pause(); // doesn't matter if pause after or before setting descr.passed I think if I set the passed property and paused the next frame it would work
 
-		Debug.Log("id1:"+id1+" 2:"+id2);
+//		LeanTween.scale(go2, Vector3.one * 4f, 10f).setEasePunch();
 
-		LeanTween.value(gameObject, Color.red, Color.green, 1f)
-                .setOnUpdate(OnTweenUpdate)
-                .setOnUpdateParam(new object[] { "" + 2 });
+		LeanTween.scaleX (go2, (go2.transform.localScale * 1.5f).x, 15f).setEase (LeanTweenType.punch);
+		LeanTween.scaleY (go2, (go2.transform.localScale * 1.5f).y, 15f).setEase (LeanTweenType.punch);
+		LeanTween.scaleZ (go2, (go2.transform.localScale * 1.5f).z, 15f).setEase (LeanTweenType.punch);
 	}
-
-	private void OnTweenUpdate( Color update, object obj){
-		object[] objArr = obj as object[];
-		Debug.Log("update:"+update+" obj:"+objArr[0]);
-		
-	}
-	
-	// Update is called once per frame
+	bool set = false;
 	void Update () {
-	
+		if (Time.unscaledTime > 5f && !set)
+		{
+			set = true;
+			descr.resume(); // once this execute the object is put at the midway position as setted by passed and the tween continue.
+			Debug.Log("resuming");
+		}
 	}
 }

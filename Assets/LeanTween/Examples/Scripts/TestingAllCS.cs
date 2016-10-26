@@ -3,10 +3,6 @@ using System.Collections;
 using System;
 using System.Threading;
 
-#if UNITY_WSA
-using Hashtable = System.Collections.Generic.Dictionary<object, object>;
-#endif
-
 public class TestingAllCS : MonoBehaviour {
 	public AnimationCurve customAnimationCurve;
 	public Transform pt1;
@@ -18,7 +14,7 @@ public class TestingAllCS : MonoBehaviour {
 	public delegate void NextFunc();
 	private int exampleIter = 0;
 	private string[] exampleFunctions = new string[] { /**/"updateValue3Example", "loopTestClamp", "loopTestPingPong", "moveOnACurveExample", "customTweenExample", "moveExample", "rotateExample", "scaleExample", "updateValueExample", "delayedCallExample", "alphaExample", "moveLocalExample", "rotateAroundExample", "colorExample" };
-	private bool useEstimatedTime = true;
+	public bool useEstimatedTime = true;
 	private GameObject ltLogo;
 	private TimingType timingType = TimingType.SteadyNormalTime;
 	private int descrTimeScaleChangeId;
@@ -40,11 +36,8 @@ public class TestingAllCS : MonoBehaviour {
 		ltLogo = GameObject.Find("LeanTweenLogo");
 		LeanTween.delayedCall(1f, cycleThroughExamples);
 		origin = ltLogo.transform.position;
-		
-		//LeanTween.move( ltLogo, Vector3.zero, 10f);
-		//LeanTween.delayedCall(2f, pauseNow);
-		//LeanTween.delayedCall(5,loopPause);
-		//LeanTween.delayedCall(8, loopResume);
+
+//		alphaExample();
 	}
 
 	void pauseNow(){
@@ -175,8 +168,7 @@ public class TestingAllCS : MonoBehaviour {
 		Debug.Log("updateValueExample");
 		Hashtable pass = new Hashtable();
 		pass.Add("message", "hi");
-        Action<float, object> action = updateValueExampleCallback;
-        LeanTween.value( gameObject, action, ltLogo.transform.eulerAngles.y, 270f, 1f ).setEase(LeanTweenType.easeOutElastic).setOnUpdateParam(pass).setUseEstimatedTime(useEstimatedTime);
+		// LeanTween.value( gameObject, updateValueExampleCallback, ltLogo.transform.eulerAngles.y, 270f, 1f ).setEase(LeanTweenType.easeOutElastic).setOnUpdateParam(pass).setUseEstimatedTime(useEstimatedTime);
 	}
 	
 	public void updateValueExampleCallback( float val, object hash ){
